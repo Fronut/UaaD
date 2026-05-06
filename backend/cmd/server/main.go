@@ -108,13 +108,7 @@ func main() {
 
 	r.Use(middleware.RequestID())
 	r.Use(middleware.PrometheusMiddleware())
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowMethods:    []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:    []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:   []string{"Content-Length"},
-		MaxAge:          12 * time.Hour,
-	}))
+	r.Use(cors.New(middleware.BuildCORSConfig(cfg.AppEnv, cfg.CORSAllowedOrigins)))
 
 	// Prometheus metrics endpoint
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))

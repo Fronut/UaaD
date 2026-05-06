@@ -139,6 +139,7 @@ cp .env.example .env  # 可选，默认值即可本地运行
 
 | 变量 | 默认值 | 说明 |
 |------|--------|------|
+| `APP_ENV` | `development` | 运行环境（`development` / `production`） |
 | `PORT` | `8080` | 后端监听端口 |
 | `JWT_SECRET` | `uaad-super-secret-key-2026` | JWT 签名密钥 |
 | `DB_HOST` / `DB_PORT` | `localhost` / `3306` | MySQL 连接 |
@@ -149,6 +150,9 @@ cp .env.example .env  # 可选，默认值即可本地运行
 | `KAFKA_BROKER` | `localhost:9092` | Kafka Broker 地址 |
 | `KAFKA_TOPIC_ENROLLMENT` | `enrollment_requests` | Kafka 报名队列 Topic |
 | `REG_RATE_LIMIT_PER_MIN` | `5` | 注册接口限流（每分钟） |
+| `CORS_ALLOWED_ORIGINS` | 空 | 逗号分隔的 CORS 白名单。开发态留空=放开；生产态留空=默认拒绝跨域 |
+
+生产部署建议显式配置 `APP_ENV=production` 与 `CORS_ALLOWED_ORIGINS`，避免跨域策略误放开。
 
 ### 4.2 编译与启动
 

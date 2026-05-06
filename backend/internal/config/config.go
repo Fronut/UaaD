@@ -24,6 +24,7 @@ type ScoringWeights struct {
 
 // Config holds all application configuration.
 type Config struct {
+	AppEnv     string
 	Port       string
 	JWTSecret  string
 	DBHost     string
@@ -44,12 +45,14 @@ type Config struct {
 	Scoring                    ScoringWeights
 	ScoreRecalcIntervalMinutes int
 	BehaviorWriteAsync         bool
+	CORSAllowedOrigins         []string
 }
 
 // Load returns a Config populated from environment variables,
 // falling back to development-friendly defaults.
 func Load() *Config {
 	return &Config{
+		AppEnv:             getEnv("APP_ENV", "development"),
 		Port:               getEnv("PORT", "8080"),
 		JWTSecret:          getEnv("JWT_SECRET", "uaad-super-secret-key-2026"),
 		DBHost:             getEnv("DB_HOST", "localhost"),
@@ -75,6 +78,7 @@ func Load() *Config {
 		},
 		ScoreRecalcIntervalMinutes: parseIntEnv("SCORE_RECALC_MINUTES", 30),
 		BehaviorWriteAsync:         parseBoolEnv("BEHAVIOR_ASYNC_WRITE", true),
+		CORSAllowedOrigins:         parseCSVEnv("CORS_ALLOWED_ORIGINS"),
 	}
 }
 
@@ -134,6 +138,22 @@ func parseBoolEnv(key string, fallback bool) bool {
 	default:
 		return fallback
 	}
+}
+
+func parseCSVEnv(key string) []string {
+	raw := strings.TrimSpace(os.Getenv(key))
+	if raw == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		v := strings.TrimSpace(p)
+		if v != "" {
+			out = append(out, v)
+		}
+	}
+	return out
 }
 
 // MySQLDSN returns a go-sql-driver DSN for GORM (utf8mb4, parseTime, UTC).
